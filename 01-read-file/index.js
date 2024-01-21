@@ -1,6 +1,6 @@
 const fs = require('fs');
-const path = require('path');
+const { join } = require('node:path');
 
-const readableStream = fs.createReadStream(path.join(__dirname, '/text.txt'));
+const readableStream = fs.createReadStream(join(__dirname, '/text.txt'));
 
 readableStream.on('data', (chunk) => console.log(chunk.toString()));
