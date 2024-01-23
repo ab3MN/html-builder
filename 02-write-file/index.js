@@ -11,7 +11,7 @@ stdout.write('Write the text: \n');
 
 r1.on('line', (text) =>
   text.trim().toLocaleLowerCase() === 'exit'
-    ? exit()
+    ? (stdout.end('Good Bye'), r1.close(), exit())
     : writeableStream.write(`${text} \n`),
 );
 
