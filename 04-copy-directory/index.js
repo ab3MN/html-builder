@@ -1,4 +1,5 @@
-const { exists, rm } = require('fs');
+const { exists, unlink } = require('fs');
+
 const { mkdir, copyFile, readdir } = require('node:fs/promises');
 const { join } = require('node:path');
 
@@ -15,7 +16,7 @@ const removeFiles = async (path) => {
 
   entryFolder.forEach(({ name }) => {
     const currentPath = join(path, name);
-    rm(currentPath, { recursive: true }, () => {});
+    unlink(currentPath, (err) => err && console.log(err));
   });
 };
 
