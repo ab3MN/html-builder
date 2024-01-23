@@ -1,23 +1,35 @@
-const { exists } = require('fs');
+const { exists, rm } = require('fs');
 const { mkdir, copyFile, readdir } = require('node:fs/promises');
-const { promisify } = require('util');
 const { join } = require('node:path');
 
-const _exists = promisify(exists);
+const REFS = {
+  originalPath: join(__dirname, 'files'),
+  copyPath: join(__dirname, 'copy-files'),
+};
 
-const ORIGINAL__NAME = join(__dirname, 'files');
-const COPY__NAME = join(__dirname, 'copy-files');
+const isExist = async (path) =>
+  new Promise((res) => exists(path, (isExist) => res(isExist)));
 
-const isExist = async (name) => await _exists(name, (isExist) => isExist);
+const removeFiles = async (path) => {
+  const entryFolder = await readdir(path, { withFileTypes: true });
 
-(async () => {
-  const _isExist = await isExist(COPY__NAME);
+  entryFolder.forEach(({ name }) => {
+    const currentPath = join(path, name);
+    rm(currentPath, { recursive: true }, () => {});
+  });
+};
 
-  if (!_isExist) await mkdir(COPY__NAME);
+(async ({ originalPath, copyPath }) => {
+  const _isExist = await isExist(copyPath);
+  if (_isExist) {
+    await removeFiles(copyPath);
+  }
 
-  const filesList = await readdir(ORIGINAL__NAME, { withFileTypes: true });
+  if (!_isExist) await mkdir(copyPath);
+
+  const filesList = await readdir(originalPath, { withFileTypes: true });
 
   filesList.forEach(({ name }) =>
-    copyFile(join(ORIGINAL__NAME, name), join(COPY__NAME, name)),
+    copyFile(join(originalPath, name), join(copyPath, name)),
   );
-})();
+})(REFS);
