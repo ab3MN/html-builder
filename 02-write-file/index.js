@@ -9,7 +9,11 @@ const writeableStream = fs.createWriteStream(join(__dirname, '/text.txt'));
 
 stdout.write('Write the text: \n');
 
-r1.on('line', (text) => writeableStream.write(`${text} \n`));
+r1.on('line', (text) =>
+  text.trim().toLocaleLowerCase() === 'exit'
+    ? exit()
+    : writeableStream.write(`${text} \n`),
+);
 
 process.on('exit', () => stdout.end('End of writing the text'));
-process.on('SIGINT', () => (r1.close(), exit()));
+process.on('SIGINT', () => r1.close());
